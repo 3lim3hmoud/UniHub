@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>UniHub | منصة اتحاد الطلاب</title>
-<link rel="icon" type="image/png" href="logo.png">
-<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="apple-touch-icon" href="assets/logo.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0b2545">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -281,6 +281,18 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
 }
 .fab-admin.visible{display:inline-flex;}
 
+/* Suggestions tabs & status badges */
+.tab-btn{cursor:pointer;}
+.tab-btn.active{background:var(--navy-900);color:#fff;border-color:var(--navy-900);}
+.status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-inline-start:6px;}
+.status-badge.pending{background:#fdf1d6;color:#9a6b00;}
+.status-badge.replied{background:#dcf3ee;color:#0d6b5a;}
+.status-badge.resolved{background:#dbeeff;color:#0b4a8f;}
+.status-badge.confidential{background:#fde2e2;color:#9a1f1f;}
+.admin-reply{background:var(--surface-2);border-radius:12px;padding:10px 14px;margin-top:10px;font-size:.85rem;}
+.admin-reply-form{margin-top:10px;display:flex;flex-direction:column;gap:8px;}
+.admin-reply-form select, .admin-reply-form textarea{width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;}
+
 @media(max-width:880px){
   .hamburger{display:block;}
   .nav-links{position:fixed;top:70px;right:0;left:0;background:var(--surface);flex-direction:column;
@@ -301,7 +313,7 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
 
 <!-- ===== Splash ===== -->
 <div id="splash">
-  <img src="logo.png" alt="Nursing Faculty Students Union" style="width:110px;height:110px;border-radius:50%;margin-bottom:14px;box-shadow:0 8px 30px -8px rgba(0,0,0,.35);">
+  <img src="assets/logo.png" alt="Nursing Faculty Students Union" style="width:110px;height:110px;border-radius:50%;margin-bottom:14px;box-shadow:0 8px 30px -8px rgba(0,0,0,.35);">
   <div class="splash-logo">Uni<span>Hub</span></div>
   <div class="pulse-dot"></div>
 </div>
@@ -310,7 +322,7 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
 <header>
   <nav>
     <div class="logo" style="display:flex;align-items:center;gap:10px;">
-      <img src="logo.png" alt="Logo" style="width:38px;height:38px;border-radius:50%;">
+      <img src="assets/logo.png" alt="Logo" style="width:38px;height:38px;border-radius:50%;">
       Uni<span>Hub</span>
     </div>
     <ul class="nav-links" id="navLinks">
@@ -318,6 +330,7 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
       <li><a href="#news">الأخبار</a></li>
       <li><a href="#events">الفعاليات</a></li>
       <li><a href="#board">هيئة الاتحاد</a></li>
+      <li><a href="#suggestions">الاقتراحات والشكاوى</a></li>
     </ul>
     <div class="nav-actions">
       <button class="icon-btn" id="themeToggle" title="الوضع الليلي">🌙</button>
@@ -406,12 +419,40 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
   </div>
 </section>
 
+<!-- ===== Suggestions & Complaints ===== -->
+<section class="section" id="suggestions" style="background:var(--surface-2);border-radius:32px;">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">صوتك بيوصل</span>
+      <h2>الاقتراحات والشكاوى</h2>
+      <p>ابعت اقتراحك أو شكواك للاتحاد — تقدر تخليها سرية لو حابب.</p>
+    </div>
+    <button class="btn btn-teal" id="addSuggestionBtn">+ اقتراح / شكوى جديدة</button>
+  </div>
+
+  <div class="tabs" id="suggestionTabs" style="display:flex;gap:10px;margin-bottom:20px;">
+    <button class="btn btn-outline tab-btn active" data-tab="public" style="background:var(--navy-900);color:#fff;border-color:var(--navy-900);">📢 العامة</button>
+    <button class="btn btn-outline tab-btn" data-tab="mine" id="mineTabBtn" style="display:none;">👤 طلباتي</button>
+    <button class="btn btn-outline tab-btn fab-admin" data-tab="admin" id="adminTabBtn">🛠 لوحة الإدارة</button>
+  </div>
+
+  <div class="grid cols-3" id="publicSuggestionsGrid" data-tab-panel="public">
+    <div class="empty-state"><div class="icon">💬</div>لسه مفيش اقتراحات عامة معروضة.</div>
+  </div>
+  <div class="grid cols-3" id="mySuggestionsGrid" data-tab-panel="mine" style="display:none;">
+    <div class="empty-state"><div class="icon">📭</div>لسه معملتش أي طلب.</div>
+  </div>
+  <div class="grid cols-3" id="adminSuggestionsGrid" data-tab-panel="admin" style="display:none;">
+    <div class="empty-state"><div class="icon">🗂</div>لسه مفيش طلبات وصلت.</div>
+  </div>
+</section>
+
 <!-- ===== Footer ===== -->
 <footer>
   <div class="footer-inner">
     <div>
       <div class="footer-logo" style="display:flex;align-items:center;gap:10px;">
-        <img src="logo.png" alt="Logo" style="width:34px;height:34px;border-radius:50%;">
+        <img src="assets/logo.png" alt="Logo" style="width:34px;height:34px;border-radius:50%;">
         Uni<span style="color:var(--teal-400)">Hub</span>
       </div>
       <p style="max-width:280px;font-size:.85rem;line-height:1.8;">المنصة الرسمية لاتحاد الطلاب — كل حاجة عن حياتك الجامعية في مكان واحد.</p>
@@ -422,11 +463,32 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
         <a href="#news">الأخبار</a>
         <a href="#events">الفعاليات</a>
         <a href="#board">هيئة الاتحاد</a>
+        <a href="#suggestions">الاقتراحات والشكاوى</a>
       </div>
     </div>
   </div>
   <div class="footer-bottom">© <span id="year"></span> UniHub — كل الحقوق محفوظة لاتحاد الطلاب</div>
 </footer>
+
+<div class="modal-overlay" id="suggestionModal">
+  <div class="modal">
+    <button class="modal-close" data-close="suggestionModal">✕</button>
+    <h3>اقتراح أو شكوى جديدة</h3>
+    <div class="field"><label>النوع</label>
+      <select id="suggestionType"><option value="اقتراح">💡 اقتراح</option><option value="شكوى">⚠️ شكوى</option></select>
+    </div>
+    <div class="field"><label>التفاصيل</label><textarea id="suggestionText" placeholder="اكتب اقتراحك أو شكواك بالتفصيل..."></textarea></div>
+    <div class="field" style="display:flex;align-items:center;gap:8px;">
+      <input type="checkbox" id="suggestionConfidential" style="width:auto;">
+      <label for="suggestionConfidential" style="margin:0;">🔒 خليها سرية (بس أنت والاتحاد هتشوفوها)</label>
+    </div>
+    <p style="color:var(--text-muted);font-size:.8rem;">لازم تكون مسجل دخول بحساب Google الأول عشان تقدر تتابع حالة طلبك.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" data-close="suggestionModal">إلغاء</button>
+      <button class="btn btn-primary" id="saveSuggestionBtn">إرسال</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===== Modals ===== -->
 <div class="modal-overlay" id="loginModal">
@@ -607,6 +669,8 @@ if(fbReady){
     document.querySelectorAll(".fab-admin").forEach(el=>{
       el.classList.toggle("visible", isAdmin);
     });
+    document.getElementById("mineTabBtn").style.display = user ? "inline-flex" : "none";
+    setupSuggestionListeners();
   });
 }
 
@@ -818,6 +882,157 @@ function escapeHtml(str){
   return str.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
+// ---------- Suggestions & Complaints ----------
+document.getElementById("addSuggestionBtn").addEventListener("click", ()=>{
+  if(!currentUser){ showToast("سجل الدخول الأول علشان تبعت اقتراح أو شكوى"); openModal("loginModal"); return; }
+  openModal("suggestionModal");
+});
+document.getElementById("saveSuggestionBtn").addEventListener("click", ()=>{
+  if(!fbReady) return showToast("لازم تظبط إعدادات Firebase الأول");
+  if(!currentUser){ showToast("سجل الدخول الأول"); return; }
+  const type = document.getElementById("suggestionType").value;
+  const text = document.getElementById("suggestionText").value.trim();
+  const isConfidential = document.getElementById("suggestionConfidential").checked;
+  if(!text) return showToast("اكتب التفاصيل الأول");
+  db.collection("suggestions").add({
+    type, text, isConfidential,
+    authorUid: currentUser.uid,
+    authorName: currentUser.displayName || "طالب",
+    authorEmail: currentUser.email,
+    status: "قيد المراجعة",
+    adminReply: "",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    closeModal("suggestionModal");
+    showToast("تم الإرسال ✅ هتقدر تتابع حالته من تبويب طلباتي");
+    document.getElementById("suggestionText").value = "";
+    document.getElementById("suggestionConfidential").checked = false;
+  }).catch(err=>showToast("خطأ: " + err.message));
+});
+
+// Tabs
+document.querySelectorAll("#suggestionTabs .tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    if(btn.id === "adminTabBtn" && !isAdmin) return;
+    document.querySelectorAll("#suggestionTabs .tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll("[data-tab-panel]").forEach(p=>{
+      p.style.display = (p.dataset.tabPanel === btn.dataset.tab) ? "grid" : "none";
+    });
+  });
+});
+
+function statusClass(status){
+  if(status === "تم الرد") return "replied";
+  if(status === "تم الحل") return "resolved";
+  return "pending";
+}
+
+function renderPublicSuggestions(docs){
+  const grid = document.getElementById("publicSuggestionsGrid");
+  if(docs.length === 0){
+    grid.innerHTML = `<div class="empty-state"><div class="icon">💬</div>لسه مفيش اقتراحات عامة معروضة.</div>`;
+    return;
+  }
+  grid.innerHTML = docs.map(d=>{
+    const s = d.data();
+    return `<div class="card">
+      <div class="card-body">
+        <span class="card-tag">${escapeHtml(s.type)}</span>
+        <span class="status-badge ${statusClass(s.status)}">${escapeHtml(s.status)}</span>
+        <div class="card-desc" style="margin-top:8px;">${escapeHtml(s.text)}</div>
+        <div style="font-size:.75rem;color:var(--text-muted);margin-top:8px;">بواسطة: ${escapeHtml(s.authorName)}</div>
+        ${s.adminReply ? `<div class="admin-reply">🎓 رد الاتحاد: ${escapeHtml(s.adminReply)}</div>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderMySuggestions(docs){
+  const grid = document.getElementById("mySuggestionsGrid");
+  if(docs.length === 0){
+    grid.innerHTML = `<div class="empty-state"><div class="icon">📭</div>لسه معملتش أي طلب.</div>`;
+    return;
+  }
+  grid.innerHTML = docs.map(d=>{
+    const s = d.data();
+    return `<div class="card">
+      <div class="card-body">
+        <span class="card-tag">${escapeHtml(s.type)}</span>
+        ${s.isConfidential ? `<span class="status-badge confidential">🔒 سرية</span>` : ""}
+        <span class="status-badge ${statusClass(s.status)}">${escapeHtml(s.status)}</span>
+        <div class="card-desc" style="margin-top:8px;">${escapeHtml(s.text)}</div>
+        ${s.adminReply ? `<div class="admin-reply">🎓 رد الاتحاد: ${escapeHtml(s.adminReply)}</div>` : `<div style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">لسه محدش رد عليه</div>`}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderAdminSuggestions(docs){
+  const grid = document.getElementById("adminSuggestionsGrid");
+  if(docs.length === 0){
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🗂</div>لسه مفيش طلبات وصلت.</div>`;
+    return;
+  }
+  grid.innerHTML = docs.map(d=>{
+    const s = d.data();
+    return `<div class="card">
+      <div class="card-body">
+        <span class="card-tag">${escapeHtml(s.type)}</span>
+        ${s.isConfidential ? `<span class="status-badge confidential">🔒 سرية</span>` : ""}
+        <span class="status-badge ${statusClass(s.status)}">${escapeHtml(s.status)}</span>
+        <div class="card-desc" style="margin-top:8px;">${escapeHtml(s.text)}</div>
+        <div style="font-size:.75rem;color:var(--text-muted);margin-top:6px;">${escapeHtml(s.authorName)} — ${escapeHtml(s.authorEmail||"")}</div>
+        <div class="admin-reply-form">
+          <select id="status-${d.id}">
+            <option value="قيد المراجعة" ${s.status==="قيد المراجعة"?"selected":""}>قيد المراجعة</option>
+            <option value="تم الرد" ${s.status==="تم الرد"?"selected":""}>تم الرد</option>
+            <option value="تم الحل" ${s.status==="تم الحل"?"selected":""}>تم الحل</option>
+          </select>
+          <textarea id="reply-${d.id}" placeholder="اكتب رد الاتحاد هنا...">${escapeHtml(s.adminReply||"")}</textarea>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary" style="flex:1;font-size:.8rem;" onclick="saveSuggestionReply('${d.id}')">حفظ الرد</button>
+            <button class="btn btn-outline" style="font-size:.8rem;" onclick="deleteDoc('suggestions','${d.id}')">حذف</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+window.saveSuggestionReply = function(id){
+  const status = document.getElementById(`status-${id}`).value;
+  const adminReply = document.getElementById(`reply-${id}`).value.trim();
+  db.collection("suggestions").doc(id).update({ status, adminReply })
+    .then(()=>showToast("تم حفظ الرد ✅"))
+    .catch(err=>showToast("خطأ: " + err.message));
+};
+
+let unsubMySuggestions = null;
+let unsubAdminSuggestions = null;
+function setupSuggestionListeners(){
+  if(!fbReady) return;
+  if(unsubMySuggestions){ unsubMySuggestions(); unsubMySuggestions = null; }
+  if(unsubAdminSuggestions){ unsubAdminSuggestions(); unsubAdminSuggestions = null; }
+  if(currentUser){
+    unsubMySuggestions = db.collection("suggestions").where("authorUid","==",currentUser.uid)
+      .orderBy("createdAt","desc").onSnapshot(
+        snap=>renderMySuggestions(snap.docs),
+        err=>console.warn("my suggestions listener:", err.message)
+      );
+  } else {
+    renderMySuggestions([]);
+  }
+  if(isAdmin){
+    unsubAdminSuggestions = db.collection("suggestions").orderBy("createdAt","desc").onSnapshot(
+      snap=>renderAdminSuggestions(snap.docs),
+      err=>console.warn("admin suggestions listener:", err.message)
+    );
+  } else {
+    renderAdminSuggestions([]);
+  }
+}
+
 // ---------- Firestore live listeners ----------
 if(fbReady){
   db.collection("news").orderBy("createdAt","desc").limit(9).onSnapshot(
@@ -831,6 +1046,10 @@ if(fbReady){
   db.collection("board").orderBy("createdAt","asc").onSnapshot(
     snap=>renderBoard(snap.docs),
     err=>console.warn("board listener:", err.message)
+  );
+  db.collection("suggestions").where("isConfidential","==",false).orderBy("createdAt","desc").onSnapshot(
+    snap=>renderPublicSuggestions(snap.docs),
+    err=>console.warn("public suggestions listener:", err.message)
   );
 } else {
   updatePulse();
