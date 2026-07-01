@@ -1,9 +1,9 @@
-const CACHE_NAME = "unihub-cache-v1";
+const CACHE_NAME = "unihub-cache-v2";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./assets/logo.png"
+  "./logo.png"
 ];
 
 // Install: pre-cache the core shell
