@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>UniHub | منصة اتحاد الطلاب</title>
-<link rel="icon" type="image/png" href="assets/logo.png">
-<link rel="apple-touch-icon" href="assets/logo.png">
+<title>اتحاد طلاب كلية التمريض | جامعة الريادة للعلوم والتكنولوجيا</title>
+<link rel="icon" type="image/png" href="assets/nursing-logo.png">
+<link rel="apple-touch-icon" href="assets/nursing-logo.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0b2545">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="UniHub">
-<meta name="description" content="المنصة الرسمية لاتحاد الطلاب - الأخبار، الفعاليات، وهيئة الاتحاد في مكان واحد">
+<meta name="apple-mobile-web-app-title" content="اتحاد التمريض">
+<meta name="description" content="المنصة الرسمية لاتحاد طلاب كلية التمريض - جامعة الريادة للعلوم والتكنولوجيا">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
 
 <style>
 /* ============================================
-   UniHub — Design Tokens
+   اتحاد طلاب كلية التمريض — Design Tokens
    Palette: Deep Navy (governance/trust) + Teal (growth/campus life) + Amber (recognition/achievement)
    Signature: "نبض الاتحاد" — a live pulse strip that ties news + countdown into one heartbeat
    ============================================ */
@@ -313,8 +313,12 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
 
 <!-- ===== Splash ===== -->
 <div id="splash">
-  <img src="assets/logo.png" alt="Nursing Faculty Students Union" style="width:110px;height:110px;border-radius:50%;margin-bottom:14px;box-shadow:0 8px 30px -8px rgba(0,0,0,.35);">
-  <div class="splash-logo">Uni<span>Hub</span></div>
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:6px;">
+    <img src="assets/university-logo.png" alt="جامعة الريادة للعلوم والتكنولوجيا" style="width:88px;height:88px;border-radius:50%;background:#fff;padding:4px;box-shadow:0 8px 30px -8px rgba(0,0,0,.35);">
+    <img src="assets/nursing-logo.png" alt="كلية التمريض" style="width:88px;height:88px;border-radius:50%;background:#fff;padding:4px;box-shadow:0 8px 30px -8px rgba(0,0,0,.35);">
+  </div>
+  <div class="splash-logo" style="font-size:1.5rem;text-align:center;">اتحاد طلاب <span>كلية التمريض</span></div>
+  <div style="color:#9fb0c9;font-size:.85rem;">جامعة الريادة للعلوم والتكنولوجيا</div>
   <div class="pulse-dot"></div>
 </div>
 
@@ -322,8 +326,9 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
 <header>
   <nav>
     <div class="logo" style="display:flex;align-items:center;gap:10px;">
-      <img src="assets/logo.png" alt="Logo" style="width:38px;height:38px;border-radius:50%;">
-      Uni<span>Hub</span>
+      <img src="assets/university-logo.png" alt="جامعة الريادة" style="width:38px;height:38px;border-radius:50%;">
+      <img src="assets/nursing-logo.png" alt="كلية التمريض" style="width:38px;height:38px;border-radius:50%;">
+      <span style="font-size:1.05rem;">اتحاد <span>التمريض</span></span>
     </div>
     <ul class="nav-links" id="navLinks">
       <li><a href="#home" class="active">الرئيسية</a></li>
@@ -334,7 +339,15 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
     </ul>
     <div class="nav-actions">
       <button class="icon-btn" id="themeToggle" title="الوضع الليلي">🌙</button>
-      <button class="btn btn-outline" id="loginBtn">تسجيل الدخول</button>
+      <div id="accountWrap" style="position:relative;">
+        <button class="icon-btn" id="loginBtn" title="الحساب" style="overflow:hidden;">👤</button>
+        <div id="accountMenu" style="display:none;position:absolute;left:0;top:48px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);min-width:220px;padding:8px;z-index:600;">
+          <div id="accountMenuInfo" style="padding:10px 12px;font-size:.82rem;color:var(--text-muted);border-bottom:1px solid var(--border);margin-bottom:6px;"></div>
+          <button class="btn btn-outline" id="analyticsMenuBtn" style="width:100%;justify-content:flex-start;display:none;margin-bottom:6px;font-size:.85rem;">📊 لوحة التحليلات</button>
+          <button class="btn btn-outline" id="logoutMenuBtn" style="width:100%;justify-content:flex-start;display:none;font-size:.85rem;">🚪 تسجيل الخروج</button>
+          <button class="btn btn-primary" id="loginMenuBtn" style="width:100%;font-size:.85rem;">تسجيل الدخول بـ Google</button>
+        </div>
+      </div>
       <button class="hamburger" id="hamburgerBtn">☰</button>
     </div>
   </nav>
@@ -343,7 +356,7 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
 <!-- Pulse strip -->
 <div class="pulse-strip">
   <div class="pulse-track" id="pulseTrack">
-    <div class="pulse-item"><span class="dot"></span> <span class="tag">مرحبًا بكم في UniHub</span> — المنصة الرسمية لاتحاد الطلاب</div>
+    <div class="pulse-item"><span class="dot"></span> <span class="tag">مرحبًا بكم في اتحاد طلاب كلية التمريض</span> — جامعة الريادة للعلوم والتكنولوجيا</div>
     <div class="pulse-item"><span class="dot"></span> جاري تحميل آخر التحديثات...</div>
   </div>
 </div>
@@ -452,10 +465,11 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
   <div class="footer-inner">
     <div>
       <div class="footer-logo" style="display:flex;align-items:center;gap:10px;">
-        <img src="assets/logo.png" alt="Logo" style="width:34px;height:34px;border-radius:50%;">
-        Uni<span style="color:var(--teal-400)">Hub</span>
+        <img src="assets/university-logo.png" alt="جامعة الريادة" style="width:32px;height:32px;border-radius:50%;">
+        <img src="assets/nursing-logo.png" alt="كلية التمريض" style="width:32px;height:32px;border-radius:50%;">
+        اتحاد <span style="color:var(--teal-400)">التمريض</span>
       </div>
-      <p style="max-width:280px;font-size:.85rem;line-height:1.8;">المنصة الرسمية لاتحاد الطلاب — كل حاجة عن حياتك الجامعية في مكان واحد.</p>
+      <p style="max-width:280px;font-size:.85rem;line-height:1.8;">المنصة الرسمية لاتحاد طلاب كلية التمريض — جامعة الريادة للعلوم والتكنولوجيا.</p>
     </div>
     <div>
       <div style="font-weight:700;color:#fff;margin-bottom:10px;">روابط سريعة</div>
@@ -467,7 +481,7 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
       </div>
     </div>
   </div>
-  <div class="footer-bottom">© <span id="year"></span> UniHub — كل الحقوق محفوظة لاتحاد الطلاب</div>
+  <div class="footer-bottom">© <span id="year"></span> اتحاد طلاب كلية التمريض — جامعة الريادة للعلوم والتكنولوجيا</div>
 </footer>
 
 <div class="modal-overlay" id="suggestionModal">
@@ -497,6 +511,50 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
     <h3>تسجيل الدخول</h3>
     <p style="color:var(--text-muted);font-size:.88rem;margin-bottom:18px;">سجّل دخولك بحساب Google للتصويت، التسجيل في الفعاليات، والمتابعة.</p>
     <button class="btn btn-primary" style="width:100%;" id="googleLoginBtn">تسجيل الدخول بـ Google</button>
+  </div>
+</div>
+
+<!-- ===== Analytics Modal (Admin only) ===== -->
+<div class="modal-overlay" id="analyticsModal">
+  <div class="modal" style="max-width:920px;">
+    <button class="modal-close" data-close="analyticsModal">✕</button>
+    <h3>📊 لوحة التحليلات</h3>
+    <div class="grid cols-4" id="analyticsStats" style="margin-bottom:24px;gap:14px;">
+      <div class="card" style="padding:16px;text-align:center;"><div style="font-size:1.6rem;font-weight:900;color:var(--navy-900);" id="statTotalUsers">—</div><div style="font-size:.78rem;color:var(--text-muted);">إجمالي المسجلين</div></div>
+      <div class="card" style="padding:16px;text-align:center;"><div style="font-size:1.6rem;font-weight:900;color:var(--navy-900);" id="statTotalVisits">—</div><div style="font-size:.78rem;color:var(--text-muted);">إجمالي مرات الدخول</div></div>
+      <div class="card" style="padding:16px;text-align:center;"><div style="font-size:1.6rem;font-weight:900;color:var(--navy-900);" id="statTodayVisits">—</div><div style="font-size:.78rem;color:var(--text-muted);">دخول اليوم</div></div>
+      <div class="card" style="padding:16px;text-align:center;"><div style="font-size:1.6rem;font-weight:900;color:var(--navy-900);" id="statTotalSuggestions">—</div><div style="font-size:.78rem;color:var(--text-muted);">اقتراحات وشكاوى</div></div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
+      <h4 style="font-family:var(--font-display);">👥 الطلاب المسجلين</h4>
+      <button class="btn btn-outline" id="exportUsersBtn" style="font-size:.8rem;">⬇️ تصدير Excel (المستخدمين)</button>
+    </div>
+    <div style="overflow-x:auto;margin-bottom:28px;">
+      <table style="width:100%;border-collapse:collapse;font-size:.82rem;" id="usersTable">
+        <thead>
+          <tr style="text-align:right;border-bottom:2px solid var(--border);">
+            <th style="padding:8px;">الاسم</th><th style="padding:8px;">الإيميل</th><th style="padding:8px;">أول دخول</th><th style="padding:8px;">آخر دخول</th><th style="padding:8px;">عدد الزيارات</th><th style="padding:8px;">اقتراحات</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody"><tr><td colspan="6" style="padding:16px;text-align:center;color:var(--text-muted);">جاري التحميل...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
+      <h4 style="font-family:var(--font-display);">🕓 آخر عمليات الدخول للتطبيق</h4>
+      <button class="btn btn-outline" id="exportVisitsBtn" style="font-size:.8rem;">⬇️ تصدير Excel (الزيارات)</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:.82rem;" id="visitsTable">
+        <thead>
+          <tr style="text-align:right;border-bottom:2px solid var(--border);">
+            <th style="padding:8px;">الاسم</th><th style="padding:8px;">الوقت</th><th style="padding:8px;">الجهاز</th>
+          </tr>
+        </thead>
+        <tbody id="visitsTableBody"><tr><td colspan="3" style="padding:16px;text-align:center;color:var(--text-muted);">جاري التحميل...</td></tr></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -563,7 +621,7 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
 
 <script>
 /* =========================================================
-   UniHub — Core Logic
+   اتحاد طلاب كلية التمريض — Core Logic
    ⚠️ إعدادات لازم تتغير قبل الرفع (بلاش مجانًا بالكامل):
    1) Firebase config تحت (اعمل مشروع جديد على firebase.google.com - Spark Plan مجاني)
    2) قائمة ADMIN_EMAILS تحت - حط إيميلات هيئة الاتحاد المسموح لهم بالإضافة
@@ -647,8 +705,29 @@ document.querySelectorAll(".modal-overlay").forEach(ov=>{
   ov.addEventListener("click", (e)=>{ if(e.target === ov) ov.classList.remove("open"); });
 });
 
-// ---------- Auth ----------
-document.getElementById("loginBtn").addEventListener("click", ()=> openModal("loginModal"));
+// ---------- Auth + Account circle ----------
+const loginBtn = document.getElementById("loginBtn");
+const accountMenu = document.getElementById("accountMenu");
+loginBtn.addEventListener("click", (e)=>{
+  e.stopPropagation();
+  accountMenu.style.display = accountMenu.style.display === "block" ? "none" : "block";
+});
+document.addEventListener("click", (e)=>{
+  if(!document.getElementById("accountWrap").contains(e.target)) accountMenu.style.display = "none";
+});
+document.getElementById("loginMenuBtn").addEventListener("click", ()=>{
+  accountMenu.style.display = "none";
+  openModal("loginModal");
+});
+document.getElementById("logoutMenuBtn").addEventListener("click", ()=>{
+  if(confirm("عايز تسجل خروج؟")) auth.signOut();
+  accountMenu.style.display = "none";
+});
+document.getElementById("analyticsMenuBtn").addEventListener("click", ()=>{
+  accountMenu.style.display = "none";
+  openModal("analyticsModal");
+  loadAnalytics();
+});
 document.getElementById("googleLoginBtn").addEventListener("click", ()=>{
   if(!fbReady){ showToast("لازم تظبط إعدادات Firebase الأول"); return; }
   const provider = new firebase.auth.GoogleAuthProvider();
@@ -656,23 +735,159 @@ document.getElementById("googleLoginBtn").addEventListener("click", ()=>{
     .then(()=>closeModal("loginModal"))
     .catch(err=>showToast("حصل خطأ: " + err.message));
 });
+
+let visitLogged = false;
 if(fbReady){
   auth.onAuthStateChanged(user=>{
     currentUser = user;
     isAdmin = !!(user && ADMIN_EMAILS.includes(user.email));
-    document.getElementById("loginBtn").textContent = user ? (user.displayName || "خروج") : "تسجيل الدخول";
-    if(user){
-      document.getElementById("loginBtn").onclick = ()=>{
-        if(confirm("عايز تسجل خروج؟")) auth.signOut();
-      };
-    }
+    loginBtn.innerHTML = user ? (user.photoURL ? `<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : "🎓") : "👤";
+    document.getElementById("accountMenuInfo").textContent = user ? (user.displayName + " — " + (user.email||"")) : "سجّل دخولك للمتابعة";
+    document.getElementById("logoutMenuBtn").style.display = user ? "block" : "none";
+    document.getElementById("loginMenuBtn").style.display = user ? "none" : "block";
+    document.getElementById("analyticsMenuBtn").style.display = isAdmin ? "block" : "none";
     document.querySelectorAll(".fab-admin").forEach(el=>{
       el.classList.toggle("visible", isAdmin);
     });
     document.getElementById("mineTabBtn").style.display = user ? "inline-flex" : "none";
     setupSuggestionListeners();
+    trackUserAndVisit(user);
   });
 }
+
+// ---------- Analytics tracking ----------
+function trackUserAndVisit(user){
+  if(!fbReady) return;
+  if(user){
+    const ref = db.collection("users").doc(user.uid);
+    ref.get().then(doc=>{
+      const now = firebase.firestore.FieldValue.serverTimestamp();
+      if(!doc.exists){
+        ref.set({
+          name: user.displayName || "بدون اسم",
+          email: user.email || "",
+          photoURL: user.photoURL || "",
+          firstSeen: now,
+          lastSeen: now,
+          visits: 1,
+          suggestionsCount: 0
+        });
+      } else {
+        ref.update({
+          name: user.displayName || "بدون اسم",
+          email: user.email || "",
+          lastSeen: now,
+          visits: firebase.firestore.FieldValue.increment(1)
+        });
+      }
+    }).catch(err=>console.warn("user tracking:", err.message));
+  }
+  if(!visitLogged){
+    visitLogged = true;
+    db.collection("analytics_visits").add({
+      uid: user ? user.uid : null,
+      name: user ? (user.displayName || "بدون اسم") : "زائر (غير مسجل)",
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      userAgent: navigator.userAgent
+    }).catch(err=>console.warn("visit tracking:", err.message));
+  }
+}
+
+function trackInteraction(uid, field){
+  if(!fbReady || !uid) return;
+  db.collection("users").doc(uid).update({
+    [field]: firebase.firestore.FieldValue.increment(1)
+  }).catch(err=>console.warn("interaction tracking:", err.message));
+}
+
+function deviceLabel(ua){
+  if(!ua) return "—";
+  if(/Android/i.test(ua)) return "📱 أندرويد";
+  if(/iPhone|iPad|iOS/i.test(ua)) return "📱 آيفون";
+  if(/Windows/i.test(ua)) return "💻 ويندوز";
+  if(/Macintosh/i.test(ua)) return "💻 ماك";
+  return "🖥️ جهاز آخر";
+}
+
+function fmtDate(ts){
+  if(!ts || !ts.toDate) return "—";
+  return ts.toDate().toLocaleString("ar-EG", { dateStyle:"medium", timeStyle:"short" });
+}
+
+function exportToCSV(filename, headers, rows){
+  const esc = v => `"${String(v??"").replace(/"/g,'""')}"`;
+  const csv = [headers.map(esc).join(","), ...rows.map(r=>r.map(esc).join(","))].join("\r\n");
+  const blob = new Blob(["\uFEFF"+csv], { type:"text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+let cachedUsersRows = [];
+let cachedVisitsRows = [];
+
+function loadAnalytics(){
+  if(!fbReady || !isAdmin) return;
+  db.collection("users").get().then(snap=>{
+    document.getElementById("statTotalUsers").textContent = snap.size;
+    let totalSuggestions = 0;
+    const rows = snap.docs.map(d=>{
+      const u = d.data();
+      totalSuggestions += (u.suggestionsCount||0);
+      return u;
+    }).sort((a,b)=> (b.lastSeen?.toMillis?.()||0) - (a.lastSeen?.toMillis?.()||0));
+    document.getElementById("statTotalSuggestions").textContent = totalSuggestions;
+    const body = document.getElementById("usersTableBody");
+    if(rows.length===0){
+      body.innerHTML = `<tr><td colspan="6" style="padding:16px;text-align:center;color:var(--text-muted);">لسه مفيش مستخدمين</td></tr>`;
+    } else {
+      body.innerHTML = rows.map(u=>`<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:8px;">${escapeHtml(u.name)}</td>
+        <td style="padding:8px;">${escapeHtml(u.email)}</td>
+        <td style="padding:8px;">${fmtDate(u.firstSeen)}</td>
+        <td style="padding:8px;">${fmtDate(u.lastSeen)}</td>
+        <td style="padding:8px;">${u.visits||0}</td>
+        <td style="padding:8px;">${u.suggestionsCount||0}</td>
+      </tr>`).join("");
+    }
+    cachedUsersRows = rows.map(u=>[u.name, u.email, fmtDate(u.firstSeen), fmtDate(u.lastSeen), u.visits||0, u.suggestionsCount||0]);
+  }).catch(err=>console.warn("load users:", err.message));
+
+  db.collection("analytics_visits").orderBy("timestamp","desc").limit(100).get().then(snap=>{
+    const today = new Date(); today.setHours(0,0,0,0);
+    let todayCount = 0;
+    const rows = snap.docs.map(d=>{
+      const v = d.data();
+      if(v.timestamp && v.timestamp.toDate && v.timestamp.toDate() >= today) todayCount++;
+      return v;
+    });
+    document.getElementById("statTodayVisits").textContent = todayCount;
+    const body = document.getElementById("visitsTableBody");
+    if(rows.length===0){
+      body.innerHTML = `<tr><td colspan="3" style="padding:16px;text-align:center;color:var(--text-muted);">لسه مفيش زيارات</td></tr>`;
+    } else {
+      body.innerHTML = rows.map(v=>`<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:8px;">${escapeHtml(v.name)}</td>
+        <td style="padding:8px;">${fmtDate(v.timestamp)}</td>
+        <td style="padding:8px;">${deviceLabel(v.userAgent)}</td>
+      </tr>`).join("");
+    }
+    cachedVisitsRows = rows.map(v=>[v.name, fmtDate(v.timestamp), deviceLabel(v.userAgent)]);
+  }).catch(err=>console.warn("load visits:", err.message));
+
+  db.collection("analytics_visits").get().then(snap=>{
+    document.getElementById("statTotalVisits").textContent = snap.size;
+  }).catch(()=>{});
+}
+
+document.getElementById("exportUsersBtn").addEventListener("click", ()=>{
+  exportToCSV("مستخدمين-اتحاد-التمريض.csv", ["الاسم","الإيميل","أول دخول","آخر دخول","عدد الزيارات","اقتراحات"], cachedUsersRows);
+});
+document.getElementById("exportVisitsBtn").addEventListener("click", ()=>{
+  exportToCSV("زيارات-اتحاد-التمريض.csv", ["الاسم","الوقت","الجهاز"], cachedVisitsRows);
+});
 
 // ---------- News ----------
 document.getElementById("addNewsBtn").addEventListener("click", ()=>openModal("newsModal"));
@@ -777,13 +992,16 @@ window.openEventDetail = function(id){
   document.getElementById("detailDesc").textContent = ev.desc || "";
   const holder = document.getElementById("qrHolder");
   holder.innerHTML = "";
-  new QRCode(holder, { text: `unihub-event:${id}`, width: 140, height: 140 });
+  new QRCode(holder, { text: `nursing-union-event:${id}`, width: 140, height: 140 });
   document.getElementById("registerBtn").onclick = ()=>{
     if(!currentUser){ showToast("سجل الدخول الأول علشان تحجز"); openModal("loginModal"); return; }
     if(!fbReady) return;
     db.collection("events").doc(id).update({
       registered: firebase.firestore.FieldValue.increment(1)
-    }).then(()=>showToast("تم تسجيل حضورك ✅")).catch(err=>showToast("خطأ: "+err.message));
+    }).then(()=>{
+      showToast("تم تسجيل حضورك ✅");
+      trackInteraction(currentUser.uid, "eventsRegisteredCount");
+    }).catch(err=>showToast("خطأ: "+err.message));
     closeModal("eventDetailModal");
   };
   openModal("eventDetailModal");
@@ -829,7 +1047,7 @@ function updatePulse(newsDocs){
     items.push(`<div class="pulse-item"><span class="dot"></span><span class="tag">فعالية</span> ${escapeHtml(ev.title)} — ${escapeHtml(ev.location||"")}</div>`);
   });
   if(items.length === 0){
-    items.push(`<div class="pulse-item"><span class="dot"></span><span class="tag">مرحبًا بكم في UniHub</span> — تابعونا لآخر الأخبار والفعاليات</div>`);
+    items.push(`<div class="pulse-item"><span class="dot"></span><span class="tag">مرحبًا بكم في اتحاد التمريض</span> — تابعونا لآخر الأخبار والفعاليات</div>`);
   }
   const track = document.getElementById("pulseTrack");
   track.innerHTML = items.join("") + items.join(""); // duplicated for seamless scroll
@@ -907,6 +1125,7 @@ document.getElementById("saveSuggestionBtn").addEventListener("click", ()=>{
     showToast("تم الإرسال ✅ هتقدر تتابع حالته من تبويب طلباتي");
     document.getElementById("suggestionText").value = "";
     document.getElementById("suggestionConfidential").checked = false;
+    trackInteraction(currentUser.uid, "suggestionsCount");
   }).catch(err=>showToast("خطأ: " + err.message));
 });
 
