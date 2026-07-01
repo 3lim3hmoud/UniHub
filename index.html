@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>UniHub | منصة اتحاد الطلاب</title>
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="apple-touch-icon" href="assets/logo.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b2545">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UniHub">
+<meta name="description" content="المنصة الرسمية لاتحاد الطلاب - الأخبار، الفعاليات، وهيئة الاتحاد في مكان واحد">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- Firebase (free tier: Auth + Firestore) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<!-- QR Code generation (free, client-side) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+/* ============================================
+   UniHub — Design Tokens
+   Palette: Deep Navy (governance/trust) + Teal (growth/campus life) + Amber (recognition/achievement)
+   Signature: "نبض الاتحاد" — a live pulse strip that ties news + countdown into one heartbeat
+   ============================================ */
+:root{
+  --navy-950:#081527;
+  --navy-900:#0b2545;
+  --navy-800:#123a6b;
+  --navy-700:#1a4d8f;
+  --teal-500:#1b998b;
+  --teal-400:#2ab7a5;
+  --amber-500:#e9b44c;
+  --amber-400:#f2c96b;
+  --bg:#f6f8fb;
+  --surface:#ffffff;
+  --surface-2:#eef2f7;
+  --text:#101a2b;
+  --text-muted:#54627a;
+  --border:#e1e7f0;
+  --radius:16px;
+  --shadow:0 8px 30px -12px rgba(11,37,69,.18);
+  --font-display:'Tajawal',sans-serif;
+  --font-body:'IBM Plex Sans Arabic','Tajawal',sans-serif;
+}
+[data-theme="dark"]{
+  --bg:#081527;
+  --surface:#0e1f38;
+  --surface-2:#122a4a;
+  --text:#eef2f7;
+  --text-muted:#9fb0c9;
+  --border:#1c3457;
+  --shadow:0 8px 30px -12px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--text);
+  transition:background .3s ease,color .3s ease;
+  min-height:100vh;
+}
+img{max-width:100%;display:block;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+a{color:inherit;text-decoration:none;}
+::selection{background:var(--teal-400);color:var(--navy-950);}
+
+/* ---------- Splash ---------- */
+#splash{
+  position:fixed;inset:0;background:var(--navy-950);z-index:9999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  transition:opacity .5s ease, visibility .5s ease;
+}
+#splash.hide{opacity:0;visibility:hidden;pointer-events:none;}
+.splash-logo{
+  font-family:var(--font-display);font-weight:900;font-size:2.4rem;color:#fff;
+  letter-spacing:1px;
+}
+.splash-logo span{color:var(--teal-400);}
+.pulse-dot{width:10px;height:10px;border-radius:50%;background:var(--teal-400);animation:pulse-anim 1.2s ease-in-out infinite;}
+@keyframes pulse-anim{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.8);opacity:.4;}}
+
+/* ---------- Nav ---------- */
+header{
+  position:sticky;top:0;z-index:500;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(8px);
+}
+nav{
+  max-width:1200px;margin:0 auto;padding:14px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.logo{font-family:var(--font-display);font-weight:900;font-size:1.4rem;color:var(--navy-900);}
+[data-theme="dark"] .logo{color:#fff;}
+.logo span{color:var(--teal-500);}
+.nav-links{display:flex;gap:6px;align-items:center;list-style:none;}
+.nav-links a{
+  padding:9px 16px;border-radius:999px;font-weight:600;font-size:.95rem;color:var(--text-muted);
+  transition:all .2s ease;
+}
+.nav-links a:hover,.nav-links a.active{background:var(--surface-2);color:var(--navy-900);}
+[data-theme="dark"] .nav-links a:hover,[data-theme="dark"] .nav-links a.active{color:#fff;}
+.nav-actions{display:flex;align-items:center;gap:10px;}
+.icon-btn{
+  width:40px;height:40px;border-radius:50%;background:var(--surface-2);
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+  transition:transform .2s ease;
+}
+.icon-btn:hover{transform:scale(1.08);}
+.btn{
+  padding:10px 20px;border-radius:999px;font-weight:700;font-size:.9rem;
+  transition:all .2s ease;
+}
+.btn-primary{background:var(--navy-900);color:#fff;}
+.btn-primary:hover{background:var(--navy-800);transform:translateY(-1px);}
+.btn-outline{border:1.5px solid var(--border);color:var(--text);}
+.btn-outline:hover{border-color:var(--teal-500);color:var(--teal-500);}
+.btn-teal{background:var(--teal-500);color:#fff;}
+.btn-teal:hover{background:var(--teal-400);}
+.hamburger{display:none;font-size:1.4rem;}
+
+/* ---------- Hero + Pulse Strip (signature element) ---------- */
+.hero{
+  max-width:1200px;margin:0 auto;padding:48px 24px 20px;
+  display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--surface-2);color:var(--teal-500);font-weight:700;font-size:.82rem;
+  padding:7px 14px;border-radius:999px;margin-bottom:18px;
+}
+.hero h1{
+  font-family:var(--font-display);font-weight:900;font-size:2.6rem;line-height:1.25;
+  color:var(--navy-900);margin-bottom:16px;
+}
+[data-theme="dark"] .hero h1{color:#fff;}
+.hero h1 .accent{color:var(--teal-500);}
+.hero p{color:var(--text-muted);font-size:1.05rem;line-height:1.8;margin-bottom:26px;max-width:520px;}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;}
+.hero-visual{
+  background:linear-gradient(150deg,var(--navy-900),var(--navy-700));
+  border-radius:24px;padding:32px;color:#fff;position:relative;overflow:hidden;
+  min-height:280px;display:flex;flex-direction:column;justify-content:space-between;
+}
+.hero-visual::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 80% 0%, rgba(42,183,165,.35), transparent 60%);
+}
+.countdown-label{font-size:.85rem;opacity:.8;position:relative;z-index:1;margin-bottom:6px;}
+.countdown-title{font-family:var(--font-display);font-weight:800;font-size:1.2rem;position:relative;z-index:1;margin-bottom:18px;}
+.countdown-grid{display:flex;gap:10px;position:relative;z-index:1;}
+.countdown-box{
+  background:rgba(255,255,255,.12);border-radius:12px;padding:12px 8px;text-align:center;flex:1;
+  backdrop-filter:blur(4px);
+}
+.countdown-box .num{font-family:var(--font-display);font-weight:900;font-size:1.6rem;display:block;}
+.countdown-box .lbl{font-size:.72rem;opacity:.8;}
+.president-quote{
+  position:relative;z-index:1;margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,.2);
+  font-size:.88rem;line-height:1.7;opacity:.9;font-style:italic;
+}
+
+/* Pulse ticker — the "heartbeat" of the union: latest news + events combined */
+.pulse-strip{
+  background:var(--navy-950);color:#fff;overflow:hidden;position:relative;
+  padding:12px 0;margin-top:10px;
+}
+.pulse-track{display:flex;gap:48px;white-space:nowrap;animation:scroll-pulse 28s linear infinite;width:max-content;}
+@keyframes scroll-pulse{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.pulse-item{display:flex;align-items:center;gap:10px;font-size:.88rem;font-weight:500;}
+.pulse-item .dot{width:6px;height:6px;border-radius:50%;background:var(--teal-400);flex-shrink:0;}
+.pulse-item .tag{color:var(--amber-400);font-weight:700;}
+
+/* ---------- Sections ---------- */
+.section{max-width:1200px;margin:0 auto;padding:64px 24px;}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:32px;gap:16px;flex-wrap:wrap;}
+.section-head .eyebrow{color:var(--teal-500);font-weight:700;font-size:.85rem;margin-bottom:8px;display:block;}
+.section-head h2{font-family:var(--font-display);font-weight:800;font-size:1.9rem;color:var(--navy-900);}
+[data-theme="dark"] .section-head h2{color:#fff;}
+.section-head p{color:var(--text-muted);margin-top:6px;max-width:480px;}
+
+.grid{display:grid;gap:22px;}
+.grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.grid.cols-4{grid-template-columns:repeat(4,1fr);}
+
+/* Cards */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;transition:transform .25s ease,box-shadow .25s ease;display:flex;flex-direction:column;
+}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow);}
+.card-img{width:100%;height:170px;object-fit:cover;background:var(--surface-2);}
+.card-body{padding:20px;display:flex;flex-direction:column;gap:10px;flex:1;}
+.card-tag{
+  align-self:flex-start;background:var(--surface-2);color:var(--teal-500);
+  font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:999px;
+}
+.card-title{font-family:var(--font-display);font-weight:700;font-size:1.08rem;line-height:1.5;}
+.card-desc{color:var(--text-muted);font-size:.88rem;line-height:1.7;flex:1;}
+.card-meta{display:flex;align-items:center;justify-content:space-between;font-size:.8rem;color:var(--text-muted);margin-top:4px;}
+.card-footer{display:flex;gap:8px;padding:0 20px 20px;}
+
+/* Event specific */
+.event-date-badge{
+  position:absolute;top:14px;right:14px;background:#fff;color:var(--navy-900);
+  border-radius:10px;padding:6px 10px;text-align:center;font-family:var(--font-display);font-weight:800;
+  box-shadow:0 4px 14px rgba(0,0,0,.15);
+}
+.event-date-badge .day{font-size:1.15rem;line-height:1;}
+.event-date-badge .mon{font-size:.65rem;color:var(--text-muted);}
+.card-media{position:relative;}
+.seats-bar{height:6px;background:var(--surface-2);border-radius:99px;overflow:hidden;margin-top:6px;}
+.seats-fill{height:100%;background:var(--teal-500);}
+
+/* Board members */
+.member-card{text-align:center;padding:26px 18px;}
+.member-photo{
+  width:92px;height:92px;border-radius:50%;object-fit:cover;margin:0 auto 14px;
+  border:3px solid var(--surface-2);background:var(--surface-2);
+}
+.member-name{font-family:var(--font-display);font-weight:800;font-size:1.02rem;}
+.member-role{color:var(--teal-500);font-weight:700;font-size:.82rem;margin:4px 0 10px;}
+.member-bio{color:var(--text-muted);font-size:.85rem;line-height:1.7;}
+
+/* Empty state */
+.empty-state{
+  text-align:center;padding:50px 20px;color:var(--text-muted);
+  border:1.5px dashed var(--border);border-radius:var(--radius);grid-column:1/-1;
+}
+.empty-state .icon{font-size:2.2rem;margin-bottom:10px;}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(8,21,39,.55);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;z-index:2000;padding:20px;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--surface);border-radius:20px;max-width:460px;width:100%;
+  max-height:88vh;overflow-y:auto;padding:28px;position:relative;
+}
+.modal h3{font-family:var(--font-display);font-weight:800;font-size:1.3rem;margin-bottom:18px;}
+.modal-close{position:absolute;top:18px;left:18px;font-size:1.3rem;color:var(--text-muted);}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px;color:var(--text-muted);}
+.field input,.field textarea,.field select{
+  width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);
+  background:var(--bg);color:var(--text);font-family:inherit;font-size:.9rem;
+}
+.field textarea{resize:vertical;min-height:80px;}
+.modal-actions{display:flex;gap:10px;margin-top:18px;}
+.modal-actions .btn{flex:1;}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--navy-950);color:#fff;padding:13px 24px;border-radius:99px;
+  font-size:.88rem;font-weight:600;opacity:0;transition:all .3s ease;z-index:3000;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Footer */
+footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-top:40px;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;}
+.footer-logo{font-family:var(--font-display);font-weight:900;font-size:1.3rem;color:#fff;margin-bottom:8px;}
+.footer-bottom{max-width:1200px;margin:32px auto 0;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);
+  font-size:.8rem;text-align:center;color:#7d8ba3;}
+
+/* Admin FAB */
+.fab-admin{
+  display:none;position:relative;
+}
+.fab-admin.visible{display:inline-flex;}
+
+@media(max-width:880px){
+  .hamburger{display:block;}
+  .nav-links{position:fixed;top:70px;right:0;left:0;background:var(--surface);flex-direction:column;
+    padding:16px;border-bottom:1px solid var(--border);transform:translateY(-150%);transition:transform .3s ease;}
+  .nav-links.open{transform:translateY(0);}
+  .nav-links a{width:100%;text-align:center;}
+  .hero{grid-template-columns:1fr;padding-top:28px;}
+  .hero h1{font-size:2rem;}
+  .grid.cols-3,.grid.cols-4{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:560px){
+  .grid.cols-3,.grid.cols-4{grid-template-columns:1fr;}
+  .section{padding:44px 18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Splash ===== -->
+<div id="splash">
+  <img src="assets/logo.png" alt="Nursing Faculty Students Union" style="width:110px;height:110px;border-radius:50%;margin-bottom:14px;box-shadow:0 8px 30px -8px rgba(0,0,0,.35);">
+  <div class="splash-logo">Uni<span>Hub</span></div>
+  <div class="pulse-dot"></div>
+</div>
+
+<!-- ===== Header ===== -->
+<header>
+  <nav>
+    <div class="logo" style="display:flex;align-items:center;gap:10px;">
+      <img src="assets/logo.png" alt="Logo" style="width:38px;height:38px;border-radius:50%;">
+      Uni<span>Hub</span>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home" class="active">الرئيسية</a></li>
+      <li><a href="#news">الأخبار</a></li>
+      <li><a href="#events">الفعاليات</a></li>
+      <li><a href="#board">هيئة الاتحاد</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" title="الوضع الليلي">🌙</button>
+      <button class="btn btn-outline" id="loginBtn">تسجيل الدخول</button>
+      <button class="hamburger" id="hamburgerBtn">☰</button>
+    </div>
+  </nav>
+</header>
+
+<!-- Pulse strip -->
+<div class="pulse-strip">
+  <div class="pulse-track" id="pulseTrack">
+    <div class="pulse-item"><span class="dot"></span> <span class="tag">مرحبًا بكم في UniHub</span> — المنصة الرسمية لاتحاد الطلاب</div>
+    <div class="pulse-item"><span class="dot"></span> جاري تحميل آخر التحديثات...</div>
+  </div>
+</div>
+
+<!-- ===== Hero ===== -->
+<section class="hero" id="home">
+  <div>
+    <span class="hero-eyebrow">🎓 اتحاد طلاب الكلية</span>
+    <h1>كل حاجة عن اتحادك <span class="accent">في مكان واحد</span></h1>
+    <p>الأخبار، الفعاليات، وأعضاء هيئة الاتحاد — تابع كل جديد لحظة بلحظة من مكان واحد بسيط وسريع.</p>
+    <div class="hero-ctas">
+      <a href="#news" class="btn btn-primary">شوف آخر الأخبار</a>
+      <a href="#events" class="btn btn-outline">الفعاليات القادمة</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div>
+      <div class="countdown-label">أقرب فعالية</div>
+      <div class="countdown-title" id="nextEventTitle">لا توجد فعاليات قادمة حاليًا</div>
+      <div class="countdown-grid" id="countdownGrid">
+        <div class="countdown-box"><span class="num">--</span><span class="lbl">يوم</span></div>
+        <div class="countdown-box"><span class="num">--</span><span class="lbl">ساعة</span></div>
+        <div class="countdown-box"><span class="num">--</span><span class="lbl">دقيقة</span></div>
+        <div class="countdown-box"><span class="num">--</span><span class="lbl">ثانية</span></div>
+      </div>
+    </div>
+    <div class="president-quote">"هدفنا نكون صوت كل طالب، ونبني اتحاد بيشتغل بجد علشانكم." — كلمة رئيس الاتحاد</div>
+  </div>
+</section>
+
+<!-- ===== News ===== -->
+<section class="section" id="news">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">آخر التحديثات</span>
+      <h2>الأخبار والإعلانات</h2>
+      <p>قرارات الاتحاد، الأخبار، والتنبيهات المهمة أول بأول.</p>
+    </div>
+    <button class="btn btn-teal fab-admin" id="addNewsBtn">+ إضافة خبر</button>
+  </div>
+  <div class="grid cols-3" id="newsGrid">
+    <div class="empty-state"><div class="icon">📰</div>لسه مفيش أخبار مضافة. تابعونا قريبًا!</div>
+  </div>
+</section>
+
+<!-- ===== Events ===== -->
+<section class="section" id="events" style="background:var(--surface-2);border-radius:32px;">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">جدول الاتحاد</span>
+      <h2>الفعاليات القادمة</h2>
+      <p>رحلات، ورش عمل، بطولات، ومؤتمرات — احجز مكانك من دلوقتي.</p>
+    </div>
+    <button class="btn btn-teal fab-admin" id="addEventBtn">+ إضافة فعالية</button>
+  </div>
+  <div class="grid cols-3" id="eventsGrid">
+    <div class="empty-state"><div class="icon">📅</div>لا توجد فعاليات قادمة حاليًا.</div>
+  </div>
+</section>
+
+<!-- ===== Union Board ===== -->
+<section class="section" id="board">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">تعرف عليهم</span>
+      <h2>هيئة الاتحاد</h2>
+      <p>الفريق اللي بيشتغل علشان يمثلكم ويخدمكم.</p>
+    </div>
+    <button class="btn btn-teal fab-admin" id="addMemberBtn">+ إضافة عضو</button>
+  </div>
+  <div class="grid cols-4" id="boardGrid">
+    <div class="empty-state"><div class="icon">🧑‍🤝‍🧑</div>لسه مفيش أعضاء مضافين.</div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo" style="display:flex;align-items:center;gap:10px;">
+        <img src="assets/logo.png" alt="Logo" style="width:34px;height:34px;border-radius:50%;">
+        Uni<span style="color:var(--teal-400)">Hub</span>
+      </div>
+      <p style="max-width:280px;font-size:.85rem;line-height:1.8;">المنصة الرسمية لاتحاد الطلاب — كل حاجة عن حياتك الجامعية في مكان واحد.</p>
+    </div>
+    <div>
+      <div style="font-weight:700;color:#fff;margin-bottom:10px;">روابط سريعة</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:.88rem;">
+        <a href="#news">الأخبار</a>
+        <a href="#events">الفعاليات</a>
+        <a href="#board">هيئة الاتحاد</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">© <span id="year"></span> UniHub — كل الحقوق محفوظة لاتحاد الطلاب</div>
+</footer>
+
+<!-- ===== Modals ===== -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" data-close="loginModal">✕</button>
+    <h3>تسجيل الدخول</h3>
+    <p style="color:var(--text-muted);font-size:.88rem;margin-bottom:18px;">سجّل دخولك بحساب Google للتصويت، التسجيل في الفعاليات، والمتابعة.</p>
+    <button class="btn btn-primary" style="width:100%;" id="googleLoginBtn">تسجيل الدخول بـ Google</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="newsModal">
+  <div class="modal">
+    <button class="modal-close" data-close="newsModal">✕</button>
+    <h3>إضافة خبر جديد</h3>
+    <div class="field"><label>العنوان</label><input type="text" id="newsTitle" placeholder="عنوان الخبر"></div>
+    <div class="field"><label>التصنيف</label>
+      <select id="newsTag"><option>خبر</option><option>قرار</option><option>تنبيه</option><option>نتيجة مسابقة</option></select>
+    </div>
+    <div class="field"><label>النص</label><textarea id="newsBody" placeholder="تفاصيل الخبر..."></textarea></div>
+    <div class="field"><label>رابط صورة (اختياري - Cloudinary)</label><input type="text" id="newsImg" placeholder="https://..."></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" data-close="newsModal">إلغاء</button>
+      <button class="btn btn-primary" id="saveNewsBtn">نشر الخبر</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="eventModal">
+  <div class="modal">
+    <button class="modal-close" data-close="eventModal">✕</button>
+    <h3>إضافة فعالية جديدة</h3>
+    <div class="field"><label>اسم الفعالية</label><input type="text" id="eventTitle" placeholder="مثال: رحلة الساحل الشمالي"></div>
+    <div class="field"><label>الوصف</label><textarea id="eventDesc" placeholder="تفاصيل الفعالية..."></textarea></div>
+    <div class="field"><label>التاريخ والوقت</label><input type="datetime-local" id="eventDate"></div>
+    <div class="field"><label>المكان</label><input type="text" id="eventLocation" placeholder="مثال: قاعة المؤتمرات"></div>
+    <div class="field"><label>عدد المقاعد</label><input type="number" id="eventSeats" placeholder="100"></div>
+    <div class="field"><label>رابط صورة (اختياري - Cloudinary)</label><input type="text" id="eventImg" placeholder="https://..."></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" data-close="eventModal">إلغاء</button>
+      <button class="btn btn-primary" id="saveEventBtn">نشر الفعالية</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="memberModal">
+  <div class="modal">
+    <button class="modal-close" data-close="memberModal">✕</button>
+    <h3>إضافة عضو هيئة</h3>
+    <div class="field"><label>الاسم</label><input type="text" id="memberName" placeholder="اسم العضو"></div>
+    <div class="field"><label>المنصب</label><input type="text" id="memberRole" placeholder="مثال: نائب الرئيس"></div>
+    <div class="field"><label>نبذة قصيرة</label><textarea id="memberBio" placeholder="نبذة عن العضو..."></textarea></div>
+    <div class="field"><label>رابط صورة (Cloudinary)</label><input type="text" id="memberImg" placeholder="https://..."></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" data-close="memberModal">إلغاء</button>
+      <button class="btn btn-primary" id="saveMemberBtn">إضافة العضو</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="eventDetailModal">
+  <div class="modal" style="text-align:center;">
+    <button class="modal-close" data-close="eventDetailModal">✕</button>
+    <h3 id="detailTitle" style="text-align:right;"></h3>
+    <p id="detailDesc" style="color:var(--text-muted);font-size:.9rem;line-height:1.8;margin-bottom:16px;text-align:right;"></p>
+    <div id="qrHolder" style="display:flex;justify-content:center;margin:16px 0;"></div>
+    <button class="btn btn-primary" style="width:100%;" id="registerBtn">تسجيل الحضور</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   UniHub — Core Logic
+   ⚠️ إعدادات لازم تتغير قبل الرفع (بلاش مجانًا بالكامل):
+   1) Firebase config تحت (اعمل مشروع جديد على firebase.google.com - Spark Plan مجاني)
+   2) قائمة ADMIN_EMAILS تحت - حط إيميلات هيئة الاتحاد المسموح لهم بالإضافة
+   3) لو حابب ترفع صور، اعمل حساب Cloudinary مجاني والصق الروابط يدويًا حاليًا في الحقول
+   ========================================================= */
+
+// ---------- 1) Firebase Config (استبدلها بإعدادات مشروعك) ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyBHLPAkr8NEhbPyg01v6amBXePPtiLr6X0",
+  authDomain: "unihub-a6bb3.firebaseapp.com",
+  projectId: "unihub-a6bb3",
+  storageBucket: "unihub-a6bb3.firebasestorage.app",
+  messagingSenderId: "792185108114",
+  appId: "1:792185108114:web:b26c1f28e9df1eb994184b"
+};
+let fbReady = false;
+let db, auth;
+try{
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  auth = firebase.auth();
+  fbReady = true;
+}catch(e){
+  console.warn("Firebase غير مهيأ بعد — حط بياناتك في firebaseConfig", e);
+}
+
+// ---------- 2) Admins (إيميلات هيئة الاتحاد المسموح لهم بالإضافة/التعديل) ----------
+const ADMIN_EMAILS = [
+  "alikimo1942@gmail.com"
+];
+
+let currentUser = null;
+let isAdmin = false;
+
+// ---------- Splash ----------
+window.addEventListener("load", ()=>{
+  setTimeout(()=>document.getElementById("splash").classList.add("hide"), 700);
+});
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// ---------- Theme ----------
+const themeToggle = document.getElementById("themeToggle");
+function applyTheme(mode){
+  document.documentElement.setAttribute("data-theme", mode);
+  themeToggle.textContent = mode === "dark" ? "☀️" : "🌙";
+  localStorage.setItem("unihub-theme", mode);
+}
+applyTheme(localStorage.getItem("unihub-theme") || "light");
+themeToggle.addEventListener("click", ()=>{
+  const cur = document.documentElement.getAttribute("data-theme");
+  applyTheme(cur === "dark" ? "light" : "dark");
+});
+
+// ---------- Mobile nav ----------
+document.getElementById("hamburgerBtn").addEventListener("click", ()=>{
+  document.getElementById("navLinks").classList.toggle("open");
+});
+document.querySelectorAll(".nav-links a").forEach(a=>{
+  a.addEventListener("click", ()=>{
+    document.querySelectorAll(".nav-links a").forEach(x=>x.classList.remove("active"));
+    a.classList.add("active");
+    document.getElementById("navLinks").classList.remove("open");
+  });
+});
+
+// ---------- Toast ----------
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2600);
+}
+
+// ---------- Modal helpers ----------
+function openModal(id){ document.getElementById(id).classList.add("open"); }
+function closeModal(id){ document.getElementById(id).classList.remove("open"); }
+document.querySelectorAll("[data-close]").forEach(btn=>{
+  btn.addEventListener("click", ()=>closeModal(btn.dataset.close));
+});
+document.querySelectorAll(".modal-overlay").forEach(ov=>{
+  ov.addEventListener("click", (e)=>{ if(e.target === ov) ov.classList.remove("open"); });
+});
+
+// ---------- Auth ----------
+document.getElementById("loginBtn").addEventListener("click", ()=> openModal("loginModal"));
+document.getElementById("googleLoginBtn").addEventListener("click", ()=>{
+  if(!fbReady){ showToast("لازم تظبط إعدادات Firebase الأول"); return; }
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .then(()=>closeModal("loginModal"))
+    .catch(err=>showToast("حصل خطأ: " + err.message));
+});
+if(fbReady){
+  auth.onAuthStateChanged(user=>{
+    currentUser = user;
+    isAdmin = !!(user && ADMIN_EMAILS.includes(user.email));
+    document.getElementById("loginBtn").textContent = user ? (user.displayName || "خروج") : "تسجيل الدخول";
+    if(user){
+      document.getElementById("loginBtn").onclick = ()=>{
+        if(confirm("عايز تسجل خروج؟")) auth.signOut();
+      };
+    }
+    document.querySelectorAll(".fab-admin").forEach(el=>{
+      el.classList.toggle("visible", isAdmin);
+    });
+  });
+}
+
+// ---------- News ----------
+document.getElementById("addNewsBtn").addEventListener("click", ()=>openModal("newsModal"));
+document.getElementById("saveNewsBtn").addEventListener("click", ()=>{
+  if(!fbReady) return showToast("لازم تظبط إعدادات Firebase الأول");
+  const title = document.getElementById("newsTitle").value.trim();
+  const body = document.getElementById("newsBody").value.trim();
+  const tag = document.getElementById("newsTag").value;
+  const img = document.getElementById("newsImg").value.trim();
+  if(!title || !body) return showToast("اكتب العنوان والنص الأول");
+  db.collection("news").add({
+    title, body, tag, img, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    closeModal("newsModal");
+    showToast("تم نشر الخبر ✅");
+    document.getElementById("newsTitle").value = "";
+    document.getElementById("newsBody").value = "";
+    document.getElementById("newsImg").value = "";
+  }).catch(err=>showToast("خطأ: " + err.message));
+});
+
+function renderNews(docs){
+  const grid = document.getElementById("newsGrid");
+  if(docs.length === 0){
+    grid.innerHTML = `<div class="empty-state"><div class="icon">📰</div>لسه مفيش أخبار مضافة. تابعونا قريبًا!</div>`;
+    updatePulse();
+    return;
+  }
+  grid.innerHTML = docs.map(d=>{
+    const n = d.data();
+    return `<div class="card">
+      ${n.img ? `<img src="${escapeHtml(n.img)}" class="card-img" alt="">` : ""}
+      <div class="card-body">
+        <span class="card-tag">${escapeHtml(n.tag || "خبر")}</span>
+        <div class="card-title">${escapeHtml(n.title)}</div>
+        <div class="card-desc">${escapeHtml(n.body)}</div>
+      </div>
+      ${isAdmin ? `<div class="card-footer"><button class="btn btn-outline" style="flex:1;font-size:.8rem;" onclick="deleteDoc('news','${d.id}')">حذف</button></div>` : ""}
+    </div>`;
+  }).join("");
+  updatePulse(docs);
+}
+
+// ---------- Events ----------
+let eventsCache = [];
+document.getElementById("addEventBtn").addEventListener("click", ()=>openModal("eventModal"));
+document.getElementById("saveEventBtn").addEventListener("click", ()=>{
+  if(!fbReady) return showToast("لازم تظبط إعدادات Firebase الأول");
+  const title = document.getElementById("eventTitle").value.trim();
+  const desc = document.getElementById("eventDesc").value.trim();
+  const date = document.getElementById("eventDate").value;
+  const location = document.getElementById("eventLocation").value.trim();
+  const seats = parseInt(document.getElementById("eventSeats").value) || 0;
+  const img = document.getElementById("eventImg").value.trim();
+  if(!title || !date) return showToast("اكتب اسم الفعالية والتاريخ الأول");
+  db.collection("events").add({
+    title, desc, date, location, seats, registered: 0, img,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    closeModal("eventModal");
+    showToast("تم نشر الفعالية ✅");
+  }).catch(err=>showToast("خطأ: " + err.message));
+});
+
+function renderEvents(docs){
+  eventsCache = docs.map(d=>({id:d.id, ...d.data()}));
+  const grid = document.getElementById("eventsGrid");
+  if(eventsCache.length === 0){
+    grid.innerHTML = `<div class="empty-state"><div class="icon">📅</div>لا توجد فعاليات قادمة حاليًا.</div>`;
+  } else {
+    grid.innerHTML = eventsCache.map(ev=>{
+      const d = new Date(ev.date);
+      const day = d.getDate();
+      const months = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+      const pct = ev.seats ? Math.min(100, Math.round(((ev.registered||0)/ev.seats)*100)) : 0;
+      return `<div class="card">
+        <div class="card-media">
+          ${ev.img ? `<img src="${escapeHtml(ev.img)}" class="card-img" alt="">` : `<div class="card-img"></div>`}
+          <div class="event-date-badge"><div class="day">${day}</div><div class="mon">${months[d.getMonth()]||""}</div></div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">${escapeHtml(ev.title)}</div>
+          <div class="card-desc">${escapeHtml(ev.desc||"")}</div>
+          <div class="card-meta"><span>📍 ${escapeHtml(ev.location||"—")}</span><span>${ev.registered||0}/${ev.seats||0} مقعد</span></div>
+          <div class="seats-bar"><div class="seats-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-primary" style="flex:1;" onclick="openEventDetail('${ev.id}')">التفاصيل والتسجيل</button>
+          ${isAdmin ? `<button class="btn btn-outline" onclick="deleteDoc('events','${ev.id}')">حذف</button>` : ""}
+        </div>
+      </div>`;
+    }).join("");
+  }
+  updateNextEventCountdown();
+  updatePulse();
+}
+
+window.openEventDetail = function(id){
+  const ev = eventsCache.find(e=>e.id===id);
+  if(!ev) return;
+  document.getElementById("detailTitle").textContent = ev.title;
+  document.getElementById("detailDesc").textContent = ev.desc || "";
+  const holder = document.getElementById("qrHolder");
+  holder.innerHTML = "";
+  new QRCode(holder, { text: `unihub-event:${id}`, width: 140, height: 140 });
+  document.getElementById("registerBtn").onclick = ()=>{
+    if(!currentUser){ showToast("سجل الدخول الأول علشان تحجز"); openModal("loginModal"); return; }
+    if(!fbReady) return;
+    db.collection("events").doc(id).update({
+      registered: firebase.firestore.FieldValue.increment(1)
+    }).then(()=>showToast("تم تسجيل حضورك ✅")).catch(err=>showToast("خطأ: "+err.message));
+    closeModal("eventDetailModal");
+  };
+  openModal("eventDetailModal");
+};
+
+// ---------- Countdown ----------
+let countdownTimer = null;
+function updateNextEventCountdown(){
+  const now = new Date();
+  const upcoming = eventsCache.filter(e=>new Date(e.date) > now).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  clearInterval(countdownTimer);
+  if(upcoming.length === 0){
+    document.getElementById("nextEventTitle").textContent = "لا توجد فعاليات قادمة حاليًا";
+    document.querySelectorAll("#countdownGrid .num").forEach(n=>n.textContent="--");
+    return;
+  }
+  const target = new Date(upcoming[0].date);
+  document.getElementById("nextEventTitle").textContent = upcoming[0].title;
+  function tick(){
+    const diff = target - new Date();
+    if(diff <= 0){ updateNextEventCountdown(); return; }
+    const nums = document.querySelectorAll("#countdownGrid .num");
+    nums[0].textContent = Math.floor(diff/86400000);
+    nums[1].textContent = Math.floor(diff/3600000)%24;
+    nums[2].textContent = Math.floor(diff/60000)%60;
+    nums[3].textContent = Math.floor(diff/1000)%60;
+  }
+  tick();
+  countdownTimer = setInterval(tick, 1000);
+}
+
+// ---------- Pulse strip ----------
+function updatePulse(newsDocs){
+  const news = newsDocs || [];
+  const now = new Date();
+  const upcoming = eventsCache.filter(e=>new Date(e.date) > now).slice(0,3);
+  const items = [];
+  news.slice(0,4).forEach(d=>{
+    const n = d.data();
+    items.push(`<div class="pulse-item"><span class="dot"></span><span class="tag">${escapeHtml(n.tag||"خبر")}</span> ${escapeHtml(n.title)}</div>`);
+  });
+  upcoming.forEach(ev=>{
+    items.push(`<div class="pulse-item"><span class="dot"></span><span class="tag">فعالية</span> ${escapeHtml(ev.title)} — ${escapeHtml(ev.location||"")}</div>`);
+  });
+  if(items.length === 0){
+    items.push(`<div class="pulse-item"><span class="dot"></span><span class="tag">مرحبًا بكم في UniHub</span> — تابعونا لآخر الأخبار والفعاليات</div>`);
+  }
+  const track = document.getElementById("pulseTrack");
+  track.innerHTML = items.join("") + items.join(""); // duplicated for seamless scroll
+}
+
+// ---------- Union Board ----------
+document.getElementById("addMemberBtn").addEventListener("click", ()=>openModal("memberModal"));
+document.getElementById("saveMemberBtn").addEventListener("click", ()=>{
+  if(!fbReady) return showToast("لازم تظبط إعدادات Firebase الأول");
+  const name = document.getElementById("memberName").value.trim();
+  const role = document.getElementById("memberRole").value.trim();
+  const bio = document.getElementById("memberBio").value.trim();
+  const img = document.getElementById("memberImg").value.trim();
+  if(!name || !role) return showToast("اكتب الاسم والمنصب الأول");
+  db.collection("board").add({
+    name, role, bio, img, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    closeModal("memberModal");
+    showToast("تمت إضافة العضو ✅");
+  }).catch(err=>showToast("خطأ: " + err.message));
+});
+
+function renderBoard(docs){
+  const grid = document.getElementById("boardGrid");
+  if(docs.length === 0){
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🧑‍🤝‍🧑</div>لسه مفيش أعضاء مضافين.</div>`;
+    return;
+  }
+  grid.innerHTML = docs.map(d=>{
+    const m = d.data();
+    return `<div class="card member-card">
+      ${m.img ? `<img src="${escapeHtml(m.img)}" class="member-photo" alt="">` : `<div class="member-photo"></div>`}
+      <div class="member-name">${escapeHtml(m.name)}</div>
+      <div class="member-role">${escapeHtml(m.role)}</div>
+      <div class="member-bio">${escapeHtml(m.bio||"")}</div>
+      ${isAdmin ? `<button class="btn btn-outline" style="margin-top:12px;width:100%;font-size:.8rem;" onclick="deleteDoc('board','${d.id}')">حذف</button>` : ""}
+    </div>`;
+  }).join("");
+}
+
+// ---------- Shared delete ----------
+window.deleteDoc = function(col, id){
+  if(!confirm("متأكد من الحذف؟")) return;
+  db.collection(col).doc(id).delete().then(()=>showToast("تم الحذف")).catch(err=>showToast("خطأ: "+err.message));
+};
+
+// ---------- Escape helper ----------
+function escapeHtml(str){
+  if(!str) return "";
+  return str.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+// ---------- Firestore live listeners ----------
+if(fbReady){
+  db.collection("news").orderBy("createdAt","desc").limit(9).onSnapshot(
+    snap=>renderNews(snap.docs),
+    err=>console.warn("news listener:", err.message)
+  );
+  db.collection("events").orderBy("date","asc").onSnapshot(
+    snap=>renderEvents(snap.docs),
+    err=>console.warn("events listener:", err.message)
+  );
+  db.collection("board").orderBy("createdAt","asc").onSnapshot(
+    snap=>renderBoard(snap.docs),
+    err=>console.warn("board listener:", err.message)
+  );
+} else {
+  updatePulse();
+}
+
+// ---------- PWA: Service Worker registration ----------
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("service-worker.js").catch(err=>console.warn("SW registration failed:", err));
+  });
+}
+</script>
+</body>
+</html>
