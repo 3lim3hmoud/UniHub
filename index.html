@@ -567,7 +567,13 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
       <select id="newsTag"><option>خبر</option><option>قرار</option><option>تنبيه</option><option>نتيجة مسابقة</option></select>
     </div>
     <div class="field"><label>النص</label><textarea id="newsBody" placeholder="تفاصيل الخبر..."></textarea></div>
-    <div class="field"><label>رابط صورة (اختياري - Cloudinary)</label><input type="text" id="newsImg" placeholder="https://..."></div>
+    <div class="field">
+      <label>صورة الخبر (اختياري)</label>
+      <input type="file" id="newsImgFile" accept="image/*">
+      <input type="hidden" id="newsImg" value="">
+      <div id="newsImgStatus" style="font-size:.75rem;color:var(--text-muted);margin-top:6px;"></div>
+      <img id="newsImgPreview" style="display:none;max-width:140px;max-height:140px;border-radius:10px;margin-top:8px;object-fit:cover;">
+    </div>
     <div class="modal-actions">
       <button class="btn btn-outline" data-close="newsModal">إلغاء</button>
       <button class="btn btn-primary" id="saveNewsBtn">نشر الخبر</button>
@@ -584,7 +590,13 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
     <div class="field"><label>التاريخ والوقت</label><input type="datetime-local" id="eventDate"></div>
     <div class="field"><label>المكان</label><input type="text" id="eventLocation" placeholder="مثال: قاعة المؤتمرات"></div>
     <div class="field"><label>عدد المقاعد</label><input type="number" id="eventSeats" placeholder="100"></div>
-    <div class="field"><label>رابط صورة (اختياري - Cloudinary)</label><input type="text" id="eventImg" placeholder="https://..."></div>
+    <div class="field">
+      <label>صورة الفعالية (اختياري)</label>
+      <input type="file" id="eventImgFile" accept="image/*">
+      <input type="hidden" id="eventImg" value="">
+      <div id="eventImgStatus" style="font-size:.75rem;color:var(--text-muted);margin-top:6px;"></div>
+      <img id="eventImgPreview" style="display:none;max-width:140px;max-height:140px;border-radius:10px;margin-top:8px;object-fit:cover;">
+    </div>
     <div class="modal-actions">
       <button class="btn btn-outline" data-close="eventModal">إلغاء</button>
       <button class="btn btn-primary" id="saveEventBtn">نشر الفعالية</button>
@@ -599,7 +611,13 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
     <div class="field"><label>الاسم</label><input type="text" id="memberName" placeholder="اسم العضو"></div>
     <div class="field"><label>المنصب</label><input type="text" id="memberRole" placeholder="مثال: نائب الرئيس"></div>
     <div class="field"><label>نبذة قصيرة</label><textarea id="memberBio" placeholder="نبذة عن العضو..."></textarea></div>
-    <div class="field"><label>رابط صورة (Cloudinary)</label><input type="text" id="memberImg" placeholder="https://..."></div>
+    <div class="field">
+      <label>صورة العضو (دكتور / رئيس الاتحاد ...)</label>
+      <input type="file" id="memberImgFile" accept="image/*">
+      <input type="hidden" id="memberImg" value="">
+      <div id="memberImgStatus" style="font-size:.75rem;color:var(--text-muted);margin-top:6px;"></div>
+      <img id="memberImgPreview" style="display:none;max-width:140px;max-height:140px;border-radius:10px;margin-top:8px;object-fit:cover;">
+    </div>
     <div class="modal-actions">
       <button class="btn btn-outline" data-close="memberModal">إلغاء</button>
       <button class="btn btn-primary" id="saveMemberBtn">إضافة العضو</button>
@@ -625,7 +643,7 @@ footer{background:var(--navy-950);color:#c9d4e5;padding:48px 24px 24px;margin-to
    ⚠️ إعدادات لازم تتغير قبل الرفع (بلاش مجانًا بالكامل):
    1) Firebase config تحت (اعمل مشروع جديد على firebase.google.com - Spark Plan مجاني)
    2) قائمة ADMIN_EMAILS تحت - حط إيميلات هيئة الاتحاد المسموح لهم بالإضافة
-   3) لو حابب ترفع صور، اعمل حساب Cloudinary مجاني والصق الروابط يدويًا حاليًا في الحقول
+   3) Cloudinary: اعمل حساب مجاني على cloudinary.com، وحط CLOUDINARY_CLOUD_NAME و CLOUDINARY_UPLOAD_PRESET تحت (دلوقتي بترفع الصورة من جهازك مباشرة، مفيش لصق روابط)
    ========================================================= */
 
 // ---------- 1) Firebase Config (استبدلها بإعدادات مشروعك) ----------
@@ -647,6 +665,62 @@ try{
 }catch(e){
   console.warn("Firebase غير مهيأ بعد — حط بياناتك في firebaseConfig", e);
 }
+
+// ---------- 1.5) Cloudinary Config (لرفع الصور مباشرة من الجهاز) ----------
+// روح على https://cloudinary.com اعمل حساب مجاني، وهتلاقي "Cloud name" في الـ Dashboard.
+// بعدين من Settings > Upload > Upload presets > Add upload preset،
+// خليه Signing Mode = "Unsigned" واحفظ اسمه هنا تحت.
+const CLOUDINARY_CLOUD_NAME = "dju33knsd";
+const CLOUDINARY_UPLOAD_PRESET = "unihub_uploads";
+
+function setupCloudinaryUpload(fileInputId, hiddenInputId, statusId, previewId){
+  const fileInput = document.getElementById(fileInputId);
+  const hidden = document.getElementById(hiddenInputId);
+  const status = document.getElementById(statusId);
+  const preview = document.getElementById(previewId);
+  fileInput.addEventListener("change", async ()=>{
+    const file = fileInput.files[0];
+    if(!file) return;
+    if(CLOUDINARY_CLOUD_NAME.includes("ضع_") || CLOUDINARY_UPLOAD_PRESET.includes("ضع_")){
+      status.textContent = "❌ لازم تظبط CLOUDINARY_CLOUD_NAME و CLOUDINARY_UPLOAD_PRESET في الكود الأول";
+      fileInput.value = "";
+      return;
+    }
+    status.textContent = "⏳ جاري رفع الصورة...";
+    preview.style.display = "none";
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    try{
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      if(data.secure_url){
+        hidden.value = data.secure_url;
+        status.textContent = "✅ اترفعت بنجاح";
+        preview.src = data.secure_url;
+        preview.style.display = "block";
+      } else {
+        status.textContent = "❌ خطأ في الرفع: " + (data.error?.message || "غير معروف");
+      }
+    }catch(err){
+      status.textContent = "❌ فشل الرفع: " + err.message;
+    }
+  });
+}
+function resetCloudinaryField(fileInputId, hiddenInputId, statusId, previewId){
+  document.getElementById(fileInputId).value = "";
+  document.getElementById(hiddenInputId).value = "";
+  document.getElementById(statusId).textContent = "";
+  const p = document.getElementById(previewId);
+  p.style.display = "none";
+  p.src = "";
+}
+setupCloudinaryUpload("newsImgFile","newsImg","newsImgStatus","newsImgPreview");
+setupCloudinaryUpload("eventImgFile","eventImg","eventImgStatus","eventImgPreview");
+setupCloudinaryUpload("memberImgFile","memberImg","memberImgStatus","memberImgPreview");
 
 // ---------- 2) Admins (إيميلات هيئة الاتحاد المسموح لهم بالإضافة/التعديل) ----------
 const ADMIN_EMAILS = [
@@ -905,7 +979,7 @@ document.getElementById("saveNewsBtn").addEventListener("click", ()=>{
     showToast("تم نشر الخبر ✅");
     document.getElementById("newsTitle").value = "";
     document.getElementById("newsBody").value = "";
-    document.getElementById("newsImg").value = "";
+    resetCloudinaryField("newsImgFile","newsImg","newsImgStatus","newsImgPreview");
   }).catch(err=>showToast("خطأ: " + err.message));
 });
 
@@ -949,6 +1023,12 @@ document.getElementById("saveEventBtn").addEventListener("click", ()=>{
   }).then(()=>{
     closeModal("eventModal");
     showToast("تم نشر الفعالية ✅");
+    document.getElementById("eventTitle").value = "";
+    document.getElementById("eventDesc").value = "";
+    document.getElementById("eventDate").value = "";
+    document.getElementById("eventLocation").value = "";
+    document.getElementById("eventSeats").value = "";
+    resetCloudinaryField("eventImgFile","eventImg","eventImgStatus","eventImgPreview");
   }).catch(err=>showToast("خطأ: " + err.message));
 });
 
@@ -1067,6 +1147,10 @@ document.getElementById("saveMemberBtn").addEventListener("click", ()=>{
   }).then(()=>{
     closeModal("memberModal");
     showToast("تمت إضافة العضو ✅");
+    document.getElementById("memberName").value = "";
+    document.getElementById("memberRole").value = "";
+    document.getElementById("memberBio").value = "";
+    resetCloudinaryField("memberImgFile","memberImg","memberImgStatus","memberImgPreview");
   }).catch(err=>showToast("خطأ: " + err.message));
 });
 
