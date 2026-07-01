@@ -1,4 +1,4 @@
-const CACHE_NAME = "unihub-cache-v5";
+const CACHE_NAME = "unihub-cache-v6";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
